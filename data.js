@@ -247,3 +247,28 @@ function weeklyWeightHistory() {
   }
   return result;
 }
+
+// ── Extended config defaults (for settings page) ───────────────────────────
+// Merged into getUserConfig() which already handles overrides via pt_config
+// These extend CONFIG with day-type-specific macros
+Object.assign(CONFIG, {
+  carbTarget:    100,
+  fatTarget:     45,
+  calLow:        1500,
+  proteinLow:    200,
+  carbLow:       60,
+  fatLow:        50,
+  calRefeed:     1800,
+  proteinRefeed: 200,
+  carbRefeed:    180,
+  fatRefeed:     35,
+  calPeak:       1500,
+  proteinPeak:   220,
+  carbPeak:      60,
+  fatPeak:       45,
+  cardioSessionsPerWeek: 5,
+  goalLossMin:   0.3,
+  goalLossMax:   0.7,
+  goalWeight:    null,
+  startingWeightOverride: null,
+});

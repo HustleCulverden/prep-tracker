@@ -679,6 +679,7 @@ canvas { max-width: 100%; }
   <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
   <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
   <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+  <a href="settings.html" class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Settings</a>
 </nav><script>
 // ── Prep Config ────────────────────────────────────────────────────────────
 const CONFIG = {
@@ -1176,6 +1177,15 @@ function progressBar(label, value, max, unit = '') {
   // ── Header phase badge ────────────────────────────────────────────────────
   const wk = currentWeekNum();
   document.getElementById('header-phase').textContent = phaseForWeek(wk);
+
+  // ── Pull targets from config ──────────────────────────────────────────────
+  const cfg = getUserConfig();
+  const targetVals = document.querySelectorAll('.target-val');
+  if (targetVals[0]) targetVals[0].textContent = Number(cfg.calTarget).toLocaleString();
+  if (targetVals[1]) targetVals[1].textContent = cfg.proteinTarget + 'g';
+  if (targetVals[2]) targetVals[2].textContent = Number(cfg.stepTarget).toLocaleString();
+  if (targetVals[3]) targetVals[3].textContent = cfg.waterTarget + 'L';
+  if (targetVals[4]) targetVals[4].textContent = cfg.sleepTarget + ' hrs';
 
   // Init
   renderSplitGrid();

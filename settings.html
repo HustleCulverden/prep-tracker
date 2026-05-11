@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1C1C2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Settings — Prep Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .settings-section {
+      margin-bottom: 6px;
+    }
+    .reset-zone {
+      border: 1.5px dashed var(--grey-200);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .reset-zone p {
+      font-size: 0.8rem;
+      color: var(--grey-400);
+      margin-bottom: 12px;
+    }
+    .btn-danger {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: 1.5px solid #FECACA;
+    }
+    .btn-danger:hover { background: #FEE2E2; filter: brightness(0.95); }
+    .saved-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #D1FAE5;
+      color: #065F46;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .saved-badge.show { opacity: 1; }
+    .day-type-card {
+      background: var(--grey-50);
+      border: 1.5px solid var(--grey-200);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .day-type-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .day-type-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--pink);
+      flex-shrink: 0;
+    }
+    .day-type-title .dot.peak { background: #9B59B6; }
+    .day-type-title .dot.low  { background: var(--gold); }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-row">
+    <div>
+      <h1>Settings</h1>
+      <div class="subtitle">Edit your targets & targets</div>
+    </div>
+    <span class="saved-badge" id="saved-badge">✓ Saved</span>
+  </div>
+</header>
+
+<main class="container page-content">
+
+  <!-- Prep dates -->
+  <p class="section-label">📅 Prep Dates</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Prep Start Date</label>
+          <input type="date" id="prepStart" class="form-input">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Total Weeks</label>
+          <input type="number" id="totalWeeks" class="form-input" min="1" max="52" inputmode="numeric">
+        </div>
+      </div>
+      <div class="input-row cols-3">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Show 1</label>
+          <input type="date" id="show1" class="form-input">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Show 2</label>
+          <input type="date" id="show2" class="form-input">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Show 3</label>
+          <input type="date" id="show3" class="form-input">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nutrition targets -->
+  <p class="section-label">🍽️ Nutrition Targets</p>
+
+  <div class="day-type-card">
+    <div class="day-type-title"><span class="dot"></span>Cut / Standard Days</div>
+    <div class="input-row cols-2">
+      <div class="form-group">
+        <label class="form-label">Calories</label>
+        <input type="number" id="calTarget" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" id="proteinTarget" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+    <div class="input-row cols-2">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" id="carbTarget" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" id="fatTarget" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="day-type-card">
+    <div class="day-type-title"><span class="dot low"></span>Low Days</div>
+    <div class="input-row cols-2">
+      <div class="form-group">
+        <label class="form-label">Calories</label>
+        <input type="number" id="calLow" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" id="proteinLow" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+    <div class="input-row cols-2">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" id="carbLow" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" id="fatLow" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="day-type-card">
+    <div class="day-type-title"><span class="dot"></span>Refeed Days</div>
+    <div class="input-row cols-2">
+      <div class="form-group">
+        <label class="form-label">Calories</label>
+        <input type="number" id="calRefeed" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" id="proteinRefeed" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+    <div class="input-row cols-2">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" id="carbRefeed" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" id="fatRefeed" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="day-type-card">
+    <div class="day-type-title"><span class="dot peak"></span>Peak Week</div>
+    <div class="input-row cols-2">
+      <div class="form-group">
+        <label class="form-label">Calories</label>
+        <input type="number" id="calPeak" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" id="proteinPeak" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+    <div class="input-row cols-2">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" id="carbPeak" class="form-input" inputmode="numeric">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" id="fatPeak" class="form-input" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity targets -->
+  <p class="section-label">🚶 Activity Targets</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Daily Step Target</label>
+          <input type="number" id="stepTarget" class="form-input" inputmode="numeric">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Peak Week Steps</label>
+          <input type="number" id="stepPeakWk" class="form-input" inputmode="numeric">
+        </div>
+      </div>
+      <div class="input-row cols-2">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Water Target (L)</label>
+          <input type="number" id="waterTarget" class="form-input" step="0.5" inputmode="decimal">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Sleep Target (hrs)</label>
+          <input type="number" id="sleepTarget" class="form-input" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cardio targets -->
+  <p class="section-label">🏃 Cardio Targets</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Default Cardio Type</label>
+          <select id="cardioType" class="form-select">
+            <option>Incline Walk</option>
+            <option>Outdoor Walk</option>
+            <option>Bike</option>
+            <option>Stairmill</option>
+            <option>HIIT</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Duration Target (min)</label>
+          <input type="number" id="cardioDuration" class="form-input" inputmode="numeric">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Sessions Per Week</label>
+        <div class="rating-group" id="cardio-sessions-group">
+          <button type="button" class="rating-btn" data-value="3">3</button>
+          <button type="button" class="rating-btn" data-value="4">4</button>
+          <button type="button" class="rating-btn" data-value="5">5</button>
+          <button type="button" class="rating-btn" data-value="6">6</button>
+          <button type="button" class="rating-btn" data-value="7">7</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Training -->
+  <p class="section-label">🏋️ Training</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Sessions Per Week</label>
+        <div class="rating-group" id="sessions-group">
+          <button type="button" class="rating-btn" data-value="3">3</button>
+          <button type="button" class="rating-btn" data-value="4">4</button>
+          <button type="button" class="rating-btn" data-value="5">5</button>
+          <button type="button" class="rating-btn" data-value="6">6</button>
+          <button type="button" class="rating-btn" data-value="7">7</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weight loss targets -->
+  <p class="section-label">⚖️ Weight Loss Rate</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Min loss per week (kg)</label>
+          <input type="number" id="goalLossMin" class="form-input" step="0.1" inputmode="decimal">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Max loss per week (kg)</label>
+          <input type="number" id="goalLossMax" class="form-input" step="0.1" inputmode="decimal">
+        </div>
+      </div>
+      <div class="form-hint mt-8">Used to flag weekly check-in as on track / too fast / stalled</div>
+    </div>
+  </div>
+
+  <!-- Starting stats -->
+  <p class="section-label">📊 Starting Stats</p>
+  <div class="card settings-section">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Starting Weight (kg)</label>
+          <input type="number" id="startingWeight" class="form-input" step="0.1" inputmode="decimal">
+          <div class="form-hint">Override if you logged your first weight on a different day</div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Goal Stage Weight (kg)</label>
+          <input type="number" id="goalWeight" class="form-input" step="0.1" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt-8 mb-12" id="save-btn">💾  Save All Settings</button>
+
+  <!-- Data management -->
+  <p class="section-label">🗂️ Data</p>
+  <div class="reset-zone">
+    <p>Export a backup of all your logged data as a CSV file before making any changes.</p>
+    <button class="btn btn-secondary btn-sm" id="export-btn" style="margin-bottom:10px;width:100%">📥  Export All Data (CSV)</button>
+    <p>This will permanently delete ALL logged data. This cannot be undone.</p>
+    <button class="btn btn-danger btn-sm" id="reset-btn" style="width:100%">🗑️  Reset All Data</button>
+  </div>
+
+</main>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="index.html"    class="nav-item" data-page="log">    <span class="nav-icon">📅</span>Log</a>
+  <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
+  <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
+  <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+  <a href="settings.html" class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Settings</a>
+</nav>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  initNav('settings');
+
+  const badge = document.getElementById('saved-badge');
+
+  // ── Load current config into fields ──────────────────────────────────────
+  function loadSettings() {
+    const c = getUserConfig();
+
+    document.getElementById('prepStart').value    = c.prepStart    || '';
+    document.getElementById('totalWeeks').value   = c.totalWeeks   || 25;
+    document.getElementById('show1').value        = c.show1        || '';
+    document.getElementById('show2').value        = c.show2        || '';
+    document.getElementById('show3').value        = c.show3        || '';
+
+    // Nutrition – cut
+    document.getElementById('calTarget').value    = c.calTarget    || 1640;
+    document.getElementById('proteinTarget').value= c.proteinTarget|| 200;
+    document.getElementById('carbTarget').value   = c.carbTarget   || 100;
+    document.getElementById('fatTarget').value    = c.fatTarget    || 45;
+
+    // Nutrition – low
+    document.getElementById('calLow').value       = c.calLow       || 1500;
+    document.getElementById('proteinLow').value   = c.proteinLow   || 200;
+    document.getElementById('carbLow').value      = c.carbLow      || 60;
+    document.getElementById('fatLow').value       = c.fatLow       || 50;
+
+    // Nutrition – refeed
+    document.getElementById('calRefeed').value    = c.calRefeed    || 1800;
+    document.getElementById('proteinRefeed').value= c.proteinRefeed|| 200;
+    document.getElementById('carbRefeed').value   = c.carbRefeed   || 180;
+    document.getElementById('fatRefeed').value    = c.fatRefeed    || 35;
+
+    // Nutrition – peak
+    document.getElementById('calPeak').value      = c.calPeak      || 1500;
+    document.getElementById('proteinPeak').value  = c.proteinPeak  || 220;
+    document.getElementById('carbPeak').value     = c.carbPeak     || 60;
+    document.getElementById('fatPeak').value      = c.fatPeak      || 45;
+
+    // Activity
+    document.getElementById('stepTarget').value   = c.stepTarget   || 10000;
+    document.getElementById('stepPeakWk').value   = c.stepPeakWk   || 8000;
+    document.getElementById('waterTarget').value  = c.waterTarget  || 3;
+    document.getElementById('sleepTarget').value  = c.sleepTarget  || 7.5;
+
+    // Cardio
+    document.getElementById('cardioType').value   = c.cardioType   || 'Incline Walk';
+    document.getElementById('cardioDuration').value = c.cardioDuration || 45;
+    setRatingValue(document.getElementById('cardio-sessions-group'), c.cardioSessionsPerWeek || 5);
+
+    // Training
+    setRatingValue(document.getElementById('sessions-group'), c.sessionsPerWeek || 5);
+
+    // Weight loss
+    document.getElementById('goalLossMin').value  = c.goalLossMin  || 0.3;
+    document.getElementById('goalLossMax').value  = c.goalLossMax  || 0.7;
+
+    // Starting stats
+    document.getElementById('startingWeight').value = c.startingWeightOverride || '';
+    document.getElementById('goalWeight').value      = c.goalWeight || '';
+  }
+
+  // ── Init rating groups ────────────────────────────────────────────────────
+  initRatingGroup(document.getElementById('sessions-group'));
+  initRatingGroup(document.getElementById('cardio-sessions-group'));
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  document.getElementById('save-btn').addEventListener('click', () => {
+    const updates = {
+      prepStart:    document.getElementById('prepStart').value,
+      totalWeeks:   Number(document.getElementById('totalWeeks').value),
+      show1:        document.getElementById('show1').value,
+      show2:        document.getElementById('show2').value,
+      show3:        document.getElementById('show3').value,
+
+      calTarget:    Number(document.getElementById('calTarget').value),
+      proteinTarget:Number(document.getElementById('proteinTarget').value),
+      carbTarget:   Number(document.getElementById('carbTarget').value),
+      fatTarget:    Number(document.getElementById('fatTarget').value),
+
+      calLow:       Number(document.getElementById('calLow').value),
+      proteinLow:   Number(document.getElementById('proteinLow').value),
+      carbLow:      Number(document.getElementById('carbLow').value),
+      fatLow:       Number(document.getElementById('fatLow').value),
+
+      calRefeed:    Number(document.getElementById('calRefeed').value),
+      proteinRefeed:Number(document.getElementById('proteinRefeed').value),
+      carbRefeed:   Number(document.getElementById('carbRefeed').value),
+      fatRefeed:    Number(document.getElementById('fatRefeed').value),
+
+      calPeak:      Number(document.getElementById('calPeak').value),
+      proteinPeak:  Number(document.getElementById('proteinPeak').value),
+      carbPeak:     Number(document.getElementById('carbPeak').value),
+      fatPeak:      Number(document.getElementById('fatPeak').value),
+
+      stepTarget:   Number(document.getElementById('stepTarget').value),
+      stepPeakWk:   Number(document.getElementById('stepPeakWk').value),
+      waterTarget:  Number(document.getElementById('waterTarget').value),
+      sleepTarget:  Number(document.getElementById('sleepTarget').value),
+
+      cardioType:   document.getElementById('cardioType').value,
+      cardioDuration: Number(document.getElementById('cardioDuration').value),
+      cardioSessionsPerWeek: Number(getRatingValue(document.getElementById('cardio-sessions-group'))),
+
+      sessionsPerWeek: Number(getRatingValue(document.getElementById('sessions-group'))),
+
+      goalLossMin:  Number(document.getElementById('goalLossMin').value),
+      goalLossMax:  Number(document.getElementById('goalLossMax').value),
+
+      startingWeightOverride: document.getElementById('startingWeight').value || null,
+      goalWeight:   document.getElementById('goalWeight').value || null,
+    };
+
+    saveUserConfig(updates);
+
+    // Flash saved badge
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2500);
+    showToast('✅  Settings saved!');
+  });
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+  // ── Reset ─────────────────────────────────────────────────────────────────
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Are you sure? This will permanently delete ALL your logged data and cannot be undone.')) {
+      localStorage.removeItem('pt_daily');
+      localStorage.removeItem('pt_weekly');
+      showToast('🗑️  All data cleared');
+    }
+  });
+
+  loadSettings();
+</script>
+</body>
+</html>
