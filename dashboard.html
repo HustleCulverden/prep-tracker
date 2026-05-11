@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1C1C2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Dashboard — Prep Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-row">
+    <div>
+      <h1>Dashboard</h1>
+      <div class="subtitle" id="header-sub">Progress overview</div>
+    </div>
+    <button class="btn btn-outline btn-sm" id="export-btn" style="color:white;border-color:rgba(255,255,255,0.3)">Export CSV</button>
+  </div>
+</header>
+
+<main class="container page-content">
+
+  <!-- Countdowns -->
+  <p class="section-label">⏱️ Days to Shows</p>
+  <div class="countdown-grid" id="countdowns"></div>
+
+  <!-- Key KPIs -->
+  <p class="section-label">⚖️ Weight Progress</p>
+  <div class="kpi-grid">
+    <div class="kpi-box pink">
+      <div class="kpi-value" id="kpi-current">—</div>
+      <div class="kpi-label">Current Weight</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-value" id="kpi-start">—</div>
+      <div class="kpi-label">Starting Weight</div>
+    </div>
+  </div>
+  <div class="kpi-grid cols-3">
+    <div class="kpi-box navy">
+      <div class="kpi-value" id="kpi-lost">—</div>
+      <div class="kpi-label">Total Lost</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-value" id="kpi-avg7">—</div>
+      <div class="kpi-label">7-Day Avg</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-value" id="kpi-week">—</div>
+      <div class="kpi-label">Prep Week</div>
+    </div>
+  </div>
+
+  <!-- Weight chart -->
+  <p class="section-label">📈 Weight Trend</p>
+  <div class="card">
+    <div class="card-body" style="padding:12px">
+      <div id="chart-empty" class="empty-state hidden">
+        <div class="empty-icon">📊</div>
+        <p>Start logging your daily weight to see your trend chart here.</p>
+      </div>
+      <canvas id="weight-chart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- This week snapshot -->
+  <p class="section-label">📋 This Week So Far</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="targets-grid" id="this-week-grid">
+        <!-- JS filled -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Prep progress -->
+  <p class="section-label">🏆 Prep Progress</p>
+  <div class="card">
+    <div class="card-body">
+      <div id="prep-progress"></div>
+    </div>
+  </div>
+
+  <!-- All-time averages -->
+  <p class="section-label">📊 All-Time Averages</p>
+  <div class="kpi-grid" id="alltime-kpis"></div>
+
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html"    class="nav-item" data-page="log">    <span class="nav-icon">📅</span>Log</a>
+  <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
+  <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
+  <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+</nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  initNav('dash');
+
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+  function render() {
+    // Header
+    const wk = currentWeekNum();
+    document.getElementById('header-sub').textContent = `Week ${wk} · ${phaseForWeek(wk)}`;
+
+    // Countdowns
+    renderCountdowns(document.getElementById('countdowns'));
+
+    // Weight KPIs
+    const sw  = startingWeight();
+    const cw  = currentWeight();
+    const avg = sevenDayAvg(todayISO());
+    document.getElementById('kpi-current').textContent = cw  ? fmt(cw)  : '—';
+    document.getElementById('kpi-start').textContent   = sw  ? fmt(sw)  : '—';
+    document.getElementById('kpi-avg7').textContent    = avg ? fmt(avg) : '—';
+    document.getElementById('kpi-week').textContent    = wk;
+    if (sw && cw) {
+      const lost = sw - cw;
+      document.getElementById('kpi-lost').textContent = (lost > 0 ? '-' : '+') + fmt(Math.abs(lost));
+    }
+
+    // Weight Chart
+    const history = weightHistory();
+    const chartCanvas = document.getElementById('weight-chart');
+    if (history.length < 2) {
+      chartCanvas.classList.add('hidden');
+      document.getElementById('chart-empty').classList.remove('hidden');
+    } else {
+      chartCanvas.classList.remove('hidden');
+      document.getElementById('chart-empty').classList.add('hidden');
+
+      const labels = history.map(h => formatDate(h.date, { day: 'numeric', month: 'short' }));
+      const weights = history.map(h => h.weight);
+      const avgs    = history.map(h => h.avg7 ? Number(h.avg7.toFixed(2)) : null);
+
+      if (window._weightChart) window._weightChart.destroy();
+      window._weightChart = new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Daily Weight',
+              data: weights,
+              borderColor: 'rgba(214,51,132,0.4)',
+              backgroundColor: 'transparent',
+              pointRadius: 2,
+              pointBackgroundColor: '#D63384',
+              borderWidth: 1.5,
+              tension: 0.3,
+            },
+            {
+              label: '7-Day Avg',
+              data: avgs,
+              borderColor: '#1C1C2E',
+              backgroundColor: 'transparent',
+              pointRadius: 0,
+              borderWidth: 2.5,
+              tension: 0.4,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 20 }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y ? fmt(ctx.parsed.y) + ' kg' : '—'}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { font: { family: 'DM Mono', size: 10 }, maxRotation: 45, color: '#9099B5' },
+              grid: { color: '#F0F1F5' }
+            },
+            y: {
+              ticks: { font: { family: 'DM Mono', size: 10 }, color: '#9099B5',
+                callback: v => v + ' kg' },
+              grid: { color: '#F0F1F5' }
+            }
+          }
+        }
+      });
+    }
+
+    // This week
+    const stats = weeklyStats(wk);
+    const grid  = document.getElementById('this-week-grid');
+    if (stats) {
+      grid.innerHTML = `
+        <div class="target-cell"><div class="target-name">Avg Weight</div><div class="target-val">${fmt(stats.avgWeight)} kg</div></div>
+        <div class="target-cell"><div class="target-name">Avg Cals</div><div class="target-val">${fmtInt(stats.avgCals)}</div></div>
+        <div class="target-cell"><div class="target-name">Avg Protein</div><div class="target-val">${fmtInt(stats.avgProtein)}g</div></div>
+        <div class="target-cell"><div class="target-name">Sessions</div><div class="target-val">${stats.sessions}</div></div>
+        <div class="target-cell"><div class="target-name">Cardio Mins</div><div class="target-val">${fmtInt(stats.totalCardio)}</div></div>
+        <div class="target-cell"><div class="target-name">Avg Steps</div><div class="target-val">${fmtInt(stats.avgSteps)}</div></div>
+        <div class="target-cell"><div class="target-name">Avg Energy</div><div class="target-val pink">${fmt(stats.avgEnergy)} / 5</div></div>
+        <div class="target-cell"><div class="target-name">Avg Sleep</div><div class="target-val">${fmt(stats.avgSleep)} hrs</div></div>
+      `;
+    } else {
+      grid.innerHTML = `<div style="padding:20px;text-align:center;color:var(--grey-400);font-size:0.85rem;grid-column:1/-1">Log this week's data to see stats here.</div>`;
+    }
+
+    // Prep progress
+    const daysIn   = Math.max(0, daysBetween(CONFIG.prepStart, todayISO()));
+    const daysTotal = CONFIG.totalWeeks * 7;
+    document.getElementById('prep-progress').innerHTML =
+      progressBar('Prep Progress', daysIn, daysTotal, ' days');
+
+    // All-time averages
+    const all = getAllDaily();
+    const vals = Object.values(all);
+    const allCals    = vals.map(d => d.cals).filter(Boolean).map(Number);
+    const allProtein = vals.map(d => d.protein).filter(Boolean).map(Number);
+    const allSteps   = vals.map(d => d.steps).filter(Boolean).map(Number);
+    const allSleep   = vals.map(d => d.sleep).filter(Boolean).map(Number);
+    const avg2 = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+    document.getElementById('alltime-kpis').innerHTML =
+      kpiBox(fmtInt(avg2(allCals)),    'Avg Daily Cals') +
+      kpiBox(fmtInt(avg2(allProtein)) + 'g', 'Avg Protein') +
+      kpiBox(fmtInt(avg2(allSteps)),   'Avg Steps') +
+      kpiBox(fmt(avg2(allSleep)) + 'h','Avg Sleep');
+  }
+
+  render();
+</script>
+</body>
+</html>

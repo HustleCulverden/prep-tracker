@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1C1C2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Weekly Check-In — Prep Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-row">
+    <div>
+      <h1>Weekly Check-In</h1>
+      <div class="subtitle" id="header-sub">Monday morning review</div>
+    </div>
+    <span class="phase-badge" id="header-phase">—</span>
+  </div>
+</header>
+
+<main class="container page-content">
+
+  <!-- Week selector -->
+  <div class="card">
+    <div class="card-body" style="padding:12px 16px">
+      <div class="flex-between">
+        <span class="text-sm text-muted fw-700">Review week:</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-outline btn-sm" id="prev-wk">‹</button>
+          <span id="week-label" style="font-weight:700;font-size:0.9rem;min-width:60px;text-align:center">Wk —</span>
+          <button class="btn btn-outline btn-sm" id="next-wk">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-filled stats from daily log -->
+  <p class="section-label">📊 This Week's Stats (auto-filled)</p>
+  <div class="kpi-grid" id="week-kpis">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- Biofeedback row -->
+  <div class="kpi-grid cols-3" id="week-bio">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- Goal status -->
+  <div class="card" id="goal-card">
+    <div class="card-body">
+      <div class="flex-between">
+        <span class="fw-700">Weekly loss vs target</span>
+        <span id="goal-status" style="font-size:1.1rem"></span>
+      </div>
+      <div class="text-sm text-muted mt-8" id="goal-detail"></div>
+    </div>
+  </div>
+
+  <!-- Measurements -->
+  <p class="section-label">📏 Measurements</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Waist (cm)</label>
+          <input type="number" id="waist" class="form-input" placeholder="—" step="0.5" inputmode="decimal">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Hips (cm)</label>
+          <input type="number" id="hips"  class="form-input" placeholder="—" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Progress Photos Taken?</label>
+        <div class="rating-group" id="photos-group">
+          <button type="button" class="rating-btn" data-value="yes">✅ Yes</button>
+          <button type="button" class="rating-btn" data-value="no">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coach / personal notes -->
+  <p class="section-label">📝 Notes & Next Week</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Physique notes / wins</label>
+        <textarea id="physique-notes" class="form-textarea" placeholder="How do you look and feel this week?"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adjustments to make</label>
+        <textarea id="adjustments" class="form-textarea" placeholder="Calories, cardio, training tweaks…"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Goal for next week</label>
+        <textarea id="next-goal" class="form-textarea" placeholder="What's the focus next week?"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt-8 mb-12" id="save-btn">💾  Save Check-In</button>
+
+  <!-- History list -->
+  <p class="section-label">📅 All Check-Ins</p>
+  <div class="card" style="overflow:hidden">
+    <div id="checkin-history"><!-- filled by JS --></div>
+  </div>
+
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html"    class="nav-item" data-page="log">    <span class="nav-icon">📅</span>Log</a>
+  <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
+  <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
+  <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+</nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  initNav('checkin');
+
+  let currentWeek = currentWeekNum();
+
+  const weekLabel    = document.getElementById('week-label');
+  const headerSub    = document.getElementById('header-sub');
+  const headerPhase  = document.getElementById('header-phase');
+  const waistEl      = document.getElementById('waist');
+  const hipsEl       = document.getElementById('hips');
+  const physiqueEl   = document.getElementById('physique-notes');
+  const adjustEl     = document.getElementById('adjustments');
+  const nextGoalEl   = document.getElementById('next-goal');
+  const photosGrp    = document.getElementById('photos-group');
+  const kpisEl       = document.getElementById('week-kpis');
+  const bioEl        = document.getElementById('week-bio');
+  const goalCardEl   = document.getElementById('goal-card');
+
+  initRatingGroup(photosGrp);
+
+  function renderWeek(wk) {
+    currentWeek = wk;
+    weekLabel.textContent = `Wk ${wk}`;
+    const start = weekStartDate(wk);
+    const end   = addDays(start, 6);
+    const phase = phaseForWeek(wk);
+    headerSub.textContent  = `${formatDate(start)} – ${formatDate(end)}`;
+    headerPhase.textContent = phase;
+
+    // Auto stats
+    const stats = weeklyStats(wk);
+    if (stats) {
+      kpisEl.innerHTML =
+        kpiBox(fmt(stats.avgWeight),  'Avg Weight', '') +
+        kpiBox(fmtInt(stats.avgCals), 'Avg Cals', '') +
+        kpiBox(fmtInt(stats.avgSteps),'Avg Steps', '') +
+        kpiBox(fmt(stats.avgSleep),   'Avg Sleep', '');
+      bioEl.innerHTML =
+        kpiBox(fmt(stats.avgEnergy),  'Energy', 'navy') +
+        kpiBox(fmt(stats.avgHunger),  'Hunger', 'navy') +
+        kpiBox(stats.sessions,        'Sessions', 'navy');
+
+      // Goal status
+      if (wk > 1) {
+        const prevAvg = weeklyAvgWeight(wk - 1);
+        if (prevAvg && stats.avgWeight) {
+          const loss = prevAvg - stats.avgWeight;
+          const cfg  = getUserConfig();
+          let emoji, msg;
+          if (loss >= cfg.goalLossMin && loss <= cfg.goalLossMax) {
+            emoji = '✅'; msg = `Lost ${fmt(loss)} kg — right on track!`;
+          } else if (loss > cfg.goalLossMax) {
+            emoji = '⚡'; msg = `Lost ${fmt(loss)} kg — dropping fast, protect fullness.`;
+          } else if (loss > 0) {
+            emoji = '🔸'; msg = `Lost ${fmt(loss)} kg — slightly slow, monitor another week.`;
+          } else {
+            emoji = '⚠️'; msg = `No loss this week (${fmt(loss)} kg) — consider a small adjustment.`;
+          }
+          document.getElementById('goal-status').textContent  = emoji;
+          document.getElementById('goal-detail').textContent  = msg;
+          goalCardEl.style.display = '';
+        } else {
+          goalCardEl.style.display = 'none';
+        }
+      } else {
+        goalCardEl.style.display = 'none';
+      }
+    } else {
+      kpisEl.innerHTML = `<div class="kpi-box" style="grid-column:1/-1"><div class="kpi-label" style="margin:0">No daily logs found for this week yet.</div></div>`;
+      bioEl.innerHTML  = '';
+      goalCardEl.style.display = 'none';
+    }
+
+    // Load saved check-in notes
+    const saved = getWeek(wk);
+    waistEl.value      = saved.waist || '';
+    hipsEl.value       = saved.hips  || '';
+    physiqueEl.value   = saved.physiqueNotes || '';
+    adjustEl.value     = saved.adjustments   || '';
+    nextGoalEl.value   = saved.nextGoal      || '';
+    setRatingValue(photosGrp, saved.photos);
+  }
+
+  function renderHistory() {
+    const el   = document.getElementById('checkin-history');
+    const all  = getAllWeekly();
+    const rows = [];
+
+    for (let w = 1; w <= CONFIG.totalWeeks; w++) {
+      const stats = weeklyStats(w);
+      const saved = getWeek(w);
+      const hasData = stats || Object.keys(saved).length > 0;
+      const start = weekStartDate(w);
+      const phase = phaseForWeek(w);
+      rows.push(`
+        <div class="week-row" onclick="renderWeek(${w});window.scrollTo(0,0)">
+          <div class="week-num ${hasData ? 'has-data' : ''}">${w}</div>
+          <div class="week-info">
+            <div class="week-date">${formatDate(start)} · ${phase}</div>
+            <div class="week-meta">${stats ? `Avg ${fmt(stats.avgWeight)} kg · ${stats.sessions} sessions` : 'No data yet'}</div>
+          </div>
+          <div class="week-weight">${stats && stats.avgWeight ? fmt(stats.avgWeight) : '—'}</div>
+          <div class="week-arrow">›</div>
+        </div>
+      `);
+    }
+    el.innerHTML = rows.join('');
+  }
+
+  document.getElementById('save-btn').addEventListener('click', () => {
+    saveWeek(currentWeek, {
+      waist:         waistEl.value      || null,
+      hips:          hipsEl.value       || null,
+      physiqueNotes: physiqueEl.value   || null,
+      adjustments:   adjustEl.value     || null,
+      nextGoal:      nextGoalEl.value   || null,
+      photos:        getRatingValue(photosGrp),
+    });
+    showToast('✅  Check-in saved!');
+    renderHistory();
+  });
+
+  document.getElementById('prev-wk').addEventListener('click', () => {
+    if (currentWeek > 1) renderWeek(currentWeek - 1);
+  });
+  document.getElementById('next-wk').addEventListener('click', () => {
+    if (currentWeek < CONFIG.totalWeeks) renderWeek(currentWeek + 1);
+  });
+
+  renderWeek(currentWeek);
+  renderHistory();
+</script>
+</body>
+</html>

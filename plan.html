@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1C1C2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Plan — Prep Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .phase-card {
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border: 1px solid var(--grey-200);
+    }
+    .phase-card.cut    { background: #FFF4E6; border-color: #F5C07A; }
+    .phase-card.peak   { background: #FCE4EF; border-color: #D63384; }
+    .phase-card.comp   { background: #E8DAEF; border-color: #9B59B6; }
+    .phase-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+    .phase-dates { font-size: 0.75rem; color: var(--grey-600); margin-bottom: 8px; }
+    .phase-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .phase-stat  { font-size: 0.8rem; }
+    .phase-stat strong { color: var(--navy); }
+
+    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .day-cell {
+      background: var(--navy-light);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .day-cell.rest { background: var(--grey-100); }
+    .day-name  { font-size: 0.62rem; font-weight: 700; color: var(--grey-400); letter-spacing: 0.05em; text-transform: uppercase; }
+    .day-sess  { font-size: 0.7rem; font-weight: 700; color: var(--navy); margin-top: 3px; }
+    .day-cell.rest .day-sess { color: var(--grey-400); }
+
+    .meal-row {
+      padding: 11px 0;
+      border-bottom: 1px solid var(--grey-100);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .meal-row:last-child { border-bottom: none; }
+    .meal-emoji { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .meal-name  { font-size: 0.78rem; font-weight: 700; color: var(--grey-400); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meal-desc  { font-size: 0.9rem; color: var(--text); margin-top: 2px; }
+    .meal-desc.placeholder { color: var(--grey-200); font-style: italic; }
+
+    .reminder-row {
+      display: flex; gap: 10px; padding: 10px 0;
+      border-bottom: 1px solid var(--grey-100);
+      align-items: flex-start;
+    }
+    .reminder-row:last-child { border-bottom: none; }
+    .reminder-icon { font-size: 1rem; flex-shrink: 0; }
+    .reminder-text { font-size: 0.88rem; line-height: 1.4; }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-row">
+    <div>
+      <h1>The Plan</h1>
+      <div class="subtitle">Your prep at a glance</div>
+    </div>
+    <span class="phase-badge" id="header-phase">—</span>
+  </div>
+</header>
+
+<main class="container page-content">
+
+  <!-- Daily targets -->
+  <p class="section-label">🎯 Daily Targets</p>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="targets-grid">
+        <div class="target-cell"><div class="target-name">Calories</div><div class="target-val pink">1,640</div></div>
+        <div class="target-cell"><div class="target-name">Protein</div><div class="target-val">200g</div></div>
+        <div class="target-cell"><div class="target-name">Steps</div><div class="target-val">10,000</div></div>
+        <div class="target-cell"><div class="target-name">Water</div><div class="target-val">3L</div></div>
+        <div class="target-cell"><div class="target-name">Sleep</div><div class="target-val">7.5 hrs</div></div>
+        <div class="target-cell"><div class="target-name">Check-In</div><div class="target-val pink">Monday</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cardio -->
+  <p class="section-label">🚶 Cardio Prescription</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="targets-grid" style="margin-bottom:0">
+        <div class="target-cell"><div class="target-name">Type</div><div class="target-val" style="font-size:0.95rem">Incline Walk</div></div>
+        <div class="target-cell"><div class="target-name">Duration</div><div class="target-val">45 min</div></div>
+        <div class="target-cell"><div class="target-name">Days/Week</div><div class="target-val">5</div></div>
+        <div class="target-cell"><div class="target-name">Time</div><div class="target-val" style="font-size:0.9rem">AM Fasted</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Training split -->
+  <p class="section-label">🏋️ Weekly Training Split</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="day-grid" id="day-grid">
+        <!-- JS fills this -->
+      </div>
+      <div class="text-sm text-muted mt-12" style="text-align:center">
+        Edit your split in the settings below ↓
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase plan -->
+  <p class="section-label">📅 Prep Phases</p>
+  <div id="phase-cards"><!-- JS --></div>
+
+  <!-- Show dates -->
+  <p class="section-label">🏆 Show Dates</p>
+  <div class="card">
+    <div class="card-body" style="padding:0">
+      <div class="meal-row" style="padding:12px 16px">
+        <div class="meal-emoji">🏆</div>
+        <div><div class="meal-name">Show 1</div><div class="meal-desc">10 October 2026 · Week 22</div></div>
+      </div>
+      <div class="meal-row" style="padding:12px 16px">
+        <div class="meal-emoji">🏆</div>
+        <div><div class="meal-name">Show 2</div><div class="meal-desc">17 October 2026 · Week 23</div></div>
+      </div>
+      <div class="meal-row" style="padding:12px 16px;border-bottom:none">
+        <div class="meal-emoji">🏆</div>
+        <div><div class="meal-name">Show 3</div><div class="meal-desc">31 October 2026 · Week 25</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meal plan -->
+  <p class="section-label">🍽️ Meal Plan</p>
+  <div class="card">
+    <div class="card-body" style="padding:0 16px">
+      <div id="meal-plan"><!-- JS --></div>
+    </div>
+  </div>
+
+  <!-- Edit meal plan -->
+  <details style="margin-bottom:12px">
+    <summary class="btn btn-secondary" style="display:flex;cursor:pointer;list-style:none;margin-bottom:0">
+      ✏️ &nbsp;Edit Meal Plan
+    </summary>
+    <div class="card mt-8">
+      <div class="card-body" id="meal-editor"><!-- JS --></div>
+    </div>
+  </details>
+
+  <!-- Edit training split -->
+  <details style="margin-bottom:12px">
+    <summary class="btn btn-secondary" style="display:flex;cursor:pointer;list-style:none;margin-bottom:0">
+      ✏️ &nbsp;Edit Training Split
+    </summary>
+    <div class="card mt-8">
+      <div class="card-body" id="split-editor"><!-- JS --></div>
+    </div>
+  </details>
+
+  <!-- Key reminders -->
+  <p class="section-label">📌 Key Reminders</p>
+  <div class="card">
+    <div class="card-body" style="padding:4px 16px">
+      <div class="reminder-row"><span class="reminder-icon">⚖️</span><span class="reminder-text">Weigh in first thing AM — same time, same conditions every day</span></div>
+      <div class="reminder-row"><span class="reminder-icon">🥩</span><span class="reminder-text">Hit 200g protein every day before filling other macros</span></div>
+      <div class="reminder-row"><span class="reminder-icon">📊</span><span class="reminder-text">Judge progress on 7-day average weight, not single days</span></div>
+      <div class="reminder-row"><span class="reminder-icon">📱</span><span class="reminder-text">Log everything in the Daily Log each morning</span></div>
+      <div class="reminder-row"><span class="reminder-icon">⚡</span><span class="reminder-text">No loss after 2 weeks: cut 100 cal OR add 15 min cardio</span></div>
+      <div class="reminder-row"><span class="reminder-icon">💧</span><span class="reminder-text">3L water daily — non-negotiable</span></div>
+    </div>
+  </div>
+
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html"    class="nav-item" data-page="log">    <span class="nav-icon">📅</span>Log</a>
+  <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
+  <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
+  <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+</nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  initNav('plan');
+
+  // ── Default data ─────────────────────────────────────────────────────────
+  const DEFAULT_SPLIT = {
+    Mon: 'Lower', Tue: 'Upper', Wed: 'Glutes',
+    Thu: 'Pull', Fri: 'Push', Sat: 'Full Body', Sun: 'Rest'
+  };
+  const DEFAULT_MEALS = [
+    { time: 'Meal 1 — Breakfast',   emoji: '🌅', desc: '' },
+    { time: 'Meal 2 — Mid Morning', emoji: '☀️', desc: '' },
+    { time: 'Meal 3 — Lunch',       emoji: '🌤️', desc: '' },
+    { time: 'Meal 4 — Pre-Training',emoji: '💪', desc: '' },
+    { time: 'Meal 5 — Post-Training',emoji: '🥤', desc: '' },
+    { time: 'Meal 6 — Dinner',      emoji: '🌙', desc: '' },
+    { time: 'Extras / Snacks',      emoji: '⭐', desc: '' },
+  ];
+
+  function getSplit() {
+    return JSON.parse(localStorage.getItem('pt_split') || JSON.stringify(DEFAULT_SPLIT));
+  }
+  function saveSplit(s) { localStorage.setItem('pt_split', JSON.stringify(s)); }
+  function getMeals() {
+    const saved = JSON.parse(localStorage.getItem('pt_meals') || '[]');
+    return DEFAULT_MEALS.map((m, i) => ({ ...m, desc: (saved[i] && saved[i].desc) || '' }));
+  }
+  function saveMeals(meals) { localStorage.setItem('pt_meals', JSON.stringify(meals)); }
+
+  // ── Render training split grid ───────────────────────────────────────────
+  function renderSplitGrid() {
+    const split = getSplit();
+    const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    document.getElementById('day-grid').innerHTML = days.map(d => `
+      <div class="day-cell ${split[d] === 'Rest' ? 'rest' : ''}">
+        <div class="day-name">${d}</div>
+        <div class="day-sess">${split[d] || '—'}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Split editor ──────────────────────────────────────────────────────────
+  function renderSplitEditor() {
+    const split   = getSplit();
+    const days    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const options = ['Lower','Upper','Glutes','Pull','Push','Full Body','Rest','Posing'];
+    const el = document.getElementById('split-editor');
+    el.innerHTML = days.map(d => `
+      <div class="flex-between" style="margin-bottom:10px">
+        <span class="fw-700" style="width:44px">${d}</span>
+        <select class="form-select" data-day="${d}" style="flex:1;margin-left:10px">
+          ${options.map(o => `<option ${split[d]===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+    `).join('') + `<button class="btn btn-primary mt-8" id="save-split">Save Split</button>`;
+    document.getElementById('save-split').addEventListener('click', () => {
+      const newSplit = {};
+      el.querySelectorAll('select[data-day]').forEach(s => newSplit[s.dataset.day] = s.value);
+      saveSplit(newSplit);
+      renderSplitGrid();
+      showToast('✅  Training split saved!');
+    });
+  }
+
+  // ── Meal plan render ──────────────────────────────────────────────────────
+  function renderMealPlan() {
+    const meals = getMeals();
+    document.getElementById('meal-plan').innerHTML = meals.map(m => `
+      <div class="meal-row">
+        <div class="meal-emoji">${m.emoji}</div>
+        <div>
+          <div class="meal-name">${m.time}</div>
+          <div class="meal-desc ${m.desc ? '' : 'placeholder'}">${m.desc || 'Tap Edit to add your meal…'}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Meal editor ───────────────────────────────────────────────────────────
+  function renderMealEditor() {
+    const meals = getMeals();
+    const el    = document.getElementById('meal-editor');
+    el.innerHTML = meals.map((m, i) => `
+      <div class="form-group">
+        <label class="form-label">${m.emoji} ${m.time}</label>
+        <textarea class="form-textarea" data-meal="${i}" style="min-height:56px" placeholder="e.g. 4 egg whites, 80g oats, 1 banana">${m.desc}</textarea>
+      </div>
+    `).join('') + `<button class="btn btn-primary" id="save-meals">Save Meal Plan</button>`;
+    document.getElementById('save-meals').addEventListener('click', () => {
+      const updated = getMeals().map((m, i) => {
+        const ta = el.querySelector(`textarea[data-meal="${i}"]`);
+        return { ...m, desc: ta ? ta.value : m.desc };
+      });
+      saveMeals(updated);
+      renderMealPlan();
+      showToast('✅  Meal plan saved!');
+    });
+  }
+
+  // ── Phase cards ───────────────────────────────────────────────────────────
+  function renderPhaseCards() {
+    const phases = [
+      { cls:'cut',  title:'Cut / Deficit', wks:'1–19', dates:'11 May → 20 Sep 2026', cal:'1,640', protein:'200g', detail:'Steady fat loss. Hit protein every day.' },
+      { cls:'peak', title:'Peak Week',     wks:'20–21',dates:'21 Sep → 4 Oct 2026',  cal:'~1,500', protein:'220g', detail:'Carb/water manipulation. Dial in conditioning.' },
+      { cls:'comp', title:'Competition',   wks:'22–25',dates:'5 Oct → 31 Oct 2026',  cal:'—',     protein:'220g', detail:'Show days. Trust the process.' },
+    ];
+    document.getElementById('phase-cards').innerHTML = phases.map(p => `
+      <div class="phase-card ${p.cls}">
+        <div class="phase-title">${p.title} <span style="font-weight:400;font-size:0.8rem;color:var(--grey-600)">Weeks ${p.wks}</span></div>
+        <div class="phase-dates">${p.dates}</div>
+        <div class="phase-stats">
+          <div class="phase-stat"><strong>${p.cal}</strong> cal</div>
+          <div class="phase-stat"><strong>${p.protein}</strong> protein</div>
+          <div class="phase-stat" style="color:var(--grey-600)">${p.detail}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Header phase badge ────────────────────────────────────────────────────
+  const wk = currentWeekNum();
+  document.getElementById('header-phase').textContent = phaseForWeek(wk);
+
+  // Init
+  renderSplitGrid();
+  renderSplitEditor();
+  renderMealPlan();
+  renderMealEditor();
+  renderPhaseCards();
+</script>
+</body>
+</html>

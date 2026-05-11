@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1C1C2E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Daily Log — Prep Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-row">
+    <div>
+      <h1 id="header-date">Today</h1>
+      <div class="subtitle" id="header-sub">Loading…</div>
+    </div>
+    <span class="phase-badge" id="header-phase">—</span>
+  </div>
+</header>
+
+<main class="container page-content">
+
+  <!-- Date picker (tap to change day) -->
+  <div class="card">
+    <div class="card-body" style="padding:12px 16px">
+      <div class="flex-between">
+        <span class="text-sm text-muted fw-700">Logging for:</span>
+        <input type="date" id="log-date" class="form-input" style="width:auto;padding:6px 10px;font-size:0.85rem">
+      </div>
+    </div>
+  </div>
+
+  <!-- Weight -->
+  <p class="section-label">⚖️ Weight</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label">AM Weight (kg)</label>
+        <input type="number" id="weight" class="form-input big" placeholder="0.0" step="0.1" inputmode="decimal">
+      </div>
+      <div class="kpi-grid cols-3" style="margin-bottom:0">
+        <div class="kpi-box">
+          <div class="kpi-value" id="avg-7d">—</div>
+          <div class="kpi-label">7-Day Avg</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-value" id="start-wt">—</div>
+          <div class="kpi-label">Start Wt</div>
+        </div>
+        <div class="kpi-box navy">
+          <div class="kpi-value" id="total-lost">—</div>
+          <div class="kpi-label">Total Lost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nutrition -->
+  <p class="section-label">🍽️ Nutrition</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Calories</label>
+          <input type="number" id="cals" class="form-input" placeholder="1640" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Protein (g)</label>
+          <input type="number" id="protein" class="form-input" placeholder="200" inputmode="numeric">
+        </div>
+      </div>
+      <div id="nutrition-bars"></div>
+    </div>
+  </div>
+
+  <!-- Training -->
+  <p class="section-label">🏋️ Training</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Did you train today?</label>
+        <div class="rating-group" id="trained-group">
+          <button type="button" class="rating-btn" data-value="yes">✅ Yes</button>
+          <button type="button" class="rating-btn" data-value="no">❌ No</button>
+          <button type="button" class="rating-btn" data-value="rest">😴 Rest</button>
+        </div>
+      </div>
+      <div class="form-group" id="session-wrap">
+        <label class="form-label">Session Type</label>
+        <select id="session-type" class="form-select">
+          <option value="">— Select —</option>
+          <option>Lower</option>
+          <option>Upper</option>
+          <option>Glutes</option>
+          <option>Pull</option>
+          <option>Push</option>
+          <option>Full Body</option>
+          <option>Posing</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cardio & Steps -->
+  <p class="section-label">🚶 Cardio & Steps</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="input-row cols-2">
+        <div class="form-group">
+          <label class="form-label">Cardio Type</label>
+          <select id="cardio-type" class="form-select">
+            <option value="">— None —</option>
+            <option selected>Incline Walk</option>
+            <option>Outdoor Walk</option>
+            <option>Bike</option>
+            <option>Stairmill</option>
+            <option>HIIT</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duration (min)</label>
+          <input type="number" id="cardio-duration" class="form-input" placeholder="45" inputmode="numeric">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Steps</label>
+        <input type="number" id="steps" class="form-input" placeholder="10000" inputmode="numeric">
+        <div class="form-hint">Target: 10,000 steps</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recovery -->
+  <p class="section-label">🌙 Recovery</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="input-row cols-2" style="margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Sleep (hrs)</label>
+          <input type="number" id="sleep" class="form-input" placeholder="7.5" step="0.5" inputmode="decimal">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Water (L)</label>
+          <input type="number" id="water" class="form-input" placeholder="3.0" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Energy (1–5)</label>
+        <div class="rating-group" id="energy-group">
+          <button type="button" class="rating-btn" data-value="1">1</button>
+          <button type="button" class="rating-btn" data-value="2">2</button>
+          <button type="button" class="rating-btn" data-value="3">3</button>
+          <button type="button" class="rating-btn" data-value="4">4</button>
+          <button type="button" class="rating-btn" data-value="5">5</button>
+        </div>
+        <div class="form-hint">1 = Exhausted · 5 = High energy all day</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Hunger (1–5)</label>
+        <div class="rating-group" id="hunger-group">
+          <button type="button" class="rating-btn" data-value="1">1</button>
+          <button type="button" class="rating-btn" data-value="2">2</button>
+          <button type="button" class="rating-btn" data-value="3">3</button>
+          <button type="button" class="rating-btn" data-value="4">4</button>
+          <button type="button" class="rating-btn" data-value="5">5</button>
+        </div>
+        <div class="form-hint">1 = Starving · 5 = Satisfied</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <p class="section-label">📝 Notes</p>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Notes / How did today feel?</label>
+        <textarea id="notes" class="form-textarea" placeholder="Any wins, struggles, or things to flag…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt-8 mb-12" id="save-btn">💾  Save Today's Log</button>
+
+</main>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="index.html"    class="nav-item" data-page="log">    <span class="nav-icon">📅</span>Log</a>
+  <a href="checkin.html"  class="nav-item" data-page="checkin"><span class="nav-icon">📋</span>Check-In</a>
+  <a href="dashboard.html"class="nav-item" data-page="dash">   <span class="nav-icon">📊</span>Dashboard</a>
+  <a href="plan.html"     class="nav-item" data-page="plan">   <span class="nav-icon">🎯</span>Plan</a>
+</nav>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  initNav('log');
+
+  const dateEl    = document.getElementById('log-date');
+  const weightEl  = document.getElementById('weight');
+  const calsEl    = document.getElementById('cals');
+  const proteinEl = document.getElementById('protein');
+  const stepsEl   = document.getElementById('steps');
+  const sleepEl   = document.getElementById('sleep');
+  const waterEl   = document.getElementById('water');
+  const notesEl   = document.getElementById('notes');
+  const sessionEl = document.getElementById('session-type');
+  const cardioTypeEl = document.getElementById('cardio-type');
+  const cardioDurEl  = document.getElementById('cardio-duration');
+  const trainedGrp   = document.getElementById('trained-group');
+  const energyGrp    = document.getElementById('energy-group');
+  const hungerGrp    = document.getElementById('hunger-group');
+
+  // Set today's date
+  dateEl.value = todayISO();
+  dateEl.max = todayISO();
+
+  function loadDateData(date) {
+    const d = getDay(date);
+    weightEl.value  = d.weight || '';
+    calsEl.value    = d.cals || '';
+    proteinEl.value = d.protein || '';
+    stepsEl.value   = d.steps || '';
+    sleepEl.value   = d.sleep || '';
+    waterEl.value   = d.water || '';
+    notesEl.value   = d.notes || '';
+    sessionEl.value = d.sessionType || '';
+    cardioTypeEl.value = d.cardioType || 'Incline Walk';
+    cardioDurEl.value  = d.cardioDuration || '';
+    setRatingValue(trainedGrp, d.trained);
+    setRatingValue(energyGrp,  d.energy);
+    setRatingValue(hungerGrp,  d.hunger);
+    updateHeader(date);
+    updateWeightStats();
+    updateNutritionBars();
+  }
+
+  function updateHeader(date) {
+    const wk = weekNumber(date);
+    const phase = wk ? phaseForWeek(wk) : '—';
+    const dayName = dayLabel(date);
+    document.getElementById('header-date').textContent = `${dayName}, ${formatDate(date)}`;
+    document.getElementById('header-sub').textContent  = wk ? `Week ${wk} of ${CONFIG.totalWeeks}` : 'Before prep start';
+    document.getElementById('header-phase').textContent = phase;
+  }
+
+  function updateWeightStats() {
+    const date = dateEl.value;
+    const avg  = sevenDayAvg(date);
+    const sw   = startingWeight();
+    const cw   = currentWeight();
+    document.getElementById('avg-7d').textContent    = avg ? fmt(avg) : '—';
+    document.getElementById('start-wt').textContent  = sw  ? fmt(sw)  : '—';
+    if (sw && cw) {
+      const lost = sw - cw;
+      document.getElementById('total-lost').textContent = (lost >= 0 ? '-' : '+') + fmt(Math.abs(lost));
+    } else {
+      document.getElementById('total-lost').textContent = '—';
+    }
+  }
+
+  function updateNutritionBars() {
+    const cals    = Number(calsEl.value) || 0;
+    const protein = Number(proteinEl.value) || 0;
+    const cfg     = getUserConfig();
+    const bars    = document.getElementById('nutrition-bars');
+    if (!cals && !protein) { bars.innerHTML = ''; return; }
+    bars.innerHTML =
+      (cals    ? progressBar('Calories', cals,    cfg.calTarget)     : '') +
+      (protein ? progressBar('Protein',  protein, cfg.proteinTarget, 'g') : '');
+  }
+
+  dateEl.addEventListener('change', () => loadDateData(dateEl.value));
+  calsEl.addEventListener('input', updateNutritionBars);
+  proteinEl.addEventListener('input', updateNutritionBars);
+  weightEl.addEventListener('input', () => {
+    // Optimistically save weight for live stats
+    const v = weightEl.value;
+    if (v) { saveDay(dateEl.value, { weight: v }); updateWeightStats(); }
+  });
+
+  // Rating groups
+  [trainedGrp, energyGrp, hungerGrp].forEach(g => initRatingGroup(g));
+
+  document.getElementById('save-btn').addEventListener('click', () => {
+    const date = dateEl.value;
+    saveDay(date, {
+      weight:       weightEl.value   || null,
+      cals:         calsEl.value     || null,
+      protein:      proteinEl.value  || null,
+      steps:        stepsEl.value    || null,
+      sleep:        sleepEl.value    || null,
+      water:        waterEl.value    || null,
+      notes:        notesEl.value    || null,
+      sessionType:  sessionEl.value  || null,
+      cardioType:   cardioTypeEl.value || null,
+      cardioDuration: cardioDurEl.value || null,
+      trained:      getRatingValue(trainedGrp),
+      energy:       getRatingValue(energyGrp),
+      hunger:       getRatingValue(hungerGrp),
+    });
+    showToast('✅  Saved!');
+    updateWeightStats();
+  });
+
+  // Init
+  loadDateData(todayISO());
+</script>
+</body>
+</html>
